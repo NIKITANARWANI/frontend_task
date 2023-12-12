@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #2c2b2b9d;
+      color: rgb(5, 5, 238);
+    }
+
+    #countdown {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #00f;
+    }
+
+    #buttons {
+      margin-top: 20px;
+    }
+
+    input {
+      font-size: 16px;
+      padding: 5px;
+      margin-bottom: 10px;
+      color: #00f;
+    }
+  </style>
+  <title>Countdown Timer</title>
+</head>
+<body>
+
+<div>
+  <p>Enter Minutes</p>
+  <input type="number" min="0" value="0" id="minutesInput">
+</div>
+
+<div id="countdown">00:00:00</div>
+<div id="buttons">
+  <button onclick="startCountdown()">Play</button>
+  <button onclick="resetCountdown()">Reset</button>
+  <button onclick="pauseCountdown()">Pause</button>
+</div>
+
+<script>
+  let minutesInput = 0;
+  let countdownInterval;
+  let paused = false;
+
+  function startCountdown() {
+    if (!countdownInterval) {
+      const endTime = new Date().getTime() + minutesInput * 60 * 1000;
+
+      countdownInterval = setInterval(function () {
+        const currentTime = new Date().getTime();
+        const timeLeft = endTime - currentTime;
+
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          updateCountdown(0);
+        } else if (!paused) {
+          updateCountdown(timeLeft);
+        }
+      }, 1000);
+    }
+  }
+
+  function updateCountdown(timeLeft) {
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    const countdownDisplay = document.getElementById("countdown");
+    countdownDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+  }
+
+  function formatTime(time) {
+    return time < 10 ? `0${time}` : time;
+  }
+
+  function resetCountdown() {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+    updateCountdown(0);
+    paused = false;
+  }
+
+  function pauseCountdown() {
+    paused = true;
+  }
+
+  // Input handling
+  const inputElement = document.getElementById("minutesInput");
+  inputElement.addEventListener("input", function () {
+    resetCountdown();
+    minutesInput = parseInt(inputElement.value, 10) || 0;
+    updateCountdown(minutesInput * 60 * 1000);
+  });
+</script>
+
+</body>
+</html>
